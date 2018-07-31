@@ -1,0 +1,57 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Load Balancer IP address Provider
+Parameters:
+  S3BucketPrefix:
+    Type: String
+    Default: 'binxio-public'
+  CFNCustomProviderZipFileName:
+    Type: String
+    Default: lambdas/cfn-lb-ip-address-provider-0.1.1.zip
+Resources:
+  LambdaPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn:
+      - LambdaRole
+    Properties:
+      PolicyName: CFNLBIpAddressProvider
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'ec2:DescribeNetworkInterfaces'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - logs:*
+            Resource: arn:aws:logs:*:*:*
+      Roles:
+        - !Ref 'LambdaRole'
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+  CFNAMIProvider:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - LambdaRole
+    Properties:
+      Description: CloudFormation Custom:LBIpAddress implementation
+      Code:
+        S3Bucket: !Sub '${S3BucketPrefix}-${AWS::Region}'
+        S3Key: !Ref 'CFNCustomProviderZipFileName'
+      FunctionName: binxio-cfn-lb-ip-address-provider
+      Handler: cfn_lb_ip_address_provider.handler
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt 'LambdaRole.Arn'
+      Runtime: python3.6
