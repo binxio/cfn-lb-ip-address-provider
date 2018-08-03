@@ -42,9 +42,6 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: !Select [ 2, !GetAtt 'Ips.PrivateIpAddresses']
-      SecurityGroupEgress:
-        - IpProtocol: '-1'
-          CidrIp: '0.0.0.0/0'
       Tags:
         - Key: Name
           Value: !Sub 'load balancer health checks'
