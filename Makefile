@@ -99,7 +99,7 @@ deploy-provider:
                 --template-body file://cloudformation/cfn-resource-provider.yaml \
                 --parameters \
                         ParameterKey=S3BucketPrefix,ParameterValue=$(S3_BUCKET_PREFIX) \
-                        ParameterKey=CFNCustomProviderZipFileName,ParameterValue=lambdas/$(NAME)-$(VERSION).zip
+                        ParameterKey=CFNCustomProviderZipFileName,ParameterValue=lambdas/$(NAME)-latest.zip
 	aws cloudformation wait stack-$(COMMAND)-complete  --stack-name $(NAME)
 
 delete-provider:
@@ -117,7 +117,8 @@ demo:
 	fi
 	aws cloudformation $(COMMAND)-stack --stack-name $(NAME)-demo \
                 --template-body file://cloudformation/demo-stack.yaml \
-		--parameters "ParameterKey=Subnets,ParameterValue=\"$(SUBNET_IDS)\""
+		--parameters "ParameterKey=VPC,ParameterValue=$(VPC_ID)"  \
+			     "ParameterKey=Subnets,ParameterValue=\"$(SUBNET_IDS)\""
 	aws cloudformation wait stack-$(COMMAND)-complete  --stack-name $(NAME)-demo
 
 delete-demo:
