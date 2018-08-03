@@ -11,8 +11,6 @@ Parameters:
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
-    DependsOn:
-      - LambdaRole
     Properties:
       PolicyName: CFNLBIpAddressProvider
       PolicyDocument:
@@ -43,7 +41,7 @@ Resources:
   CFNAMIProvider:
     Type: AWS::Lambda::Function
     DependsOn:
-      - LambdaRole
+      - LambdaPolicy
     Properties:
       Description: CloudFormation Custom:LBIpAddress implementation
       Code:

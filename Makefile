@@ -81,6 +81,7 @@ clean:
 
 test: venv
 	for n in ./cloudformation/*.yaml ; do aws cloudformation validate-template --template-body file://$$n ; done
+	for n in ./cloudformation/*.yaml ; do cfn-lint $$n ; done
 	. ./venv/bin/activate && \
 	pip --quiet install -r test-requirements.txt && \
 	cd src && \
