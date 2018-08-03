@@ -1,5 +1,5 @@
 # cfn-lb-ip-address-provider
-A CloudFormation custom resource provider for obtaining the IP addresses of an ELB.
+A CloudFormation custom resource provider for obtaining the IP addresses of an AWS Network Load Balancer.
 
 In order for the network load balancer to execute a Health Check, an ingress rule
 must be specified. As the ip addresses of the load balancers cannot be obtained and you cannot associate a security group with 
