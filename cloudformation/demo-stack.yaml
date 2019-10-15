@@ -24,7 +24,7 @@ Resources:
   LoadBalancerHealthCheckSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: !Sub 'load balancer'
+      GroupDescription: 'load balancer'
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
         - Description: lb health check
@@ -44,7 +44,7 @@ Resources:
           CidrIp: !Select [ 2, !GetAtt 'Ips.PrivateIpAddresses']
       Tags:
         - Key: Name
-          Value: !Sub 'load balancer health checks'
+          Value: 'load balancer health checks'
 
 Outputs:
   PrivateIpAddresses:
