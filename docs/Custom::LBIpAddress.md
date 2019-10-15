@@ -9,13 +9,15 @@ To obtain the private ip addresses of the load balancers in your AWS CloudFormat
   Type : "Custom::LBIpAddress",
   Properties:
     LoadBalancerArn: Arn
-    ServiceToken: String
+    Format: string
+    ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-lb-ip-address-provider'
 ```
 
 ## Properties
 You can specify the following properties:
 
 - `LoadBalancerArn`  - The arn of the load balancer.
+- `Format`           - CIDR or plain
 
 The custom resource wraps the EC2 [describe-network-interfaces](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-network-interfaces.html) function
 and searches for network interfaces with the ARN name of the load balancer in the description.
@@ -23,7 +25,7 @@ and searches for network interfaces with the ARN name of the load balancer in th
 ## Return values
 With 'Fn::GetAtt' the following values are available:
 
-- `PrivateIpAddresses` - array of private ip address of the Load Balancer, in /32 CIDR notation
+- `PrivateIpAddresses` - array of private ip address of the Load Balancer, in the specified format (cidr or plain)
 
 ### Caveat 
 - this resource depends on the informal link between the Load Balancer and the Network Interface based on the name of the description in the network interface. If AWS changes this, the provider will break.

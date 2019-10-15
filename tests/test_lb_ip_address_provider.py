@@ -29,6 +29,18 @@ def test_get_address(ec2):
     response = handler(request, {})
     assert response['Status'], 'SUCCESS'
 
+def test_plain_address(ec2):
+    request = Request('Create')
+    request['ResourceProperties']['Format'] = 'plain'
+    response = handler(request, {})
+    assert response['Status'], 'SUCCESS'
+    assert 'PhysicalResourceId' in response
+    assert 'PrivateIpAddresses' in response['Data']
+    assert len(response['Data']['PrivateIpAddresses']) == 2
+    for i in response['Data']['PrivateIpAddresses']:
+        assert re.match(r'[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+', i)
+
+
 
 class Request(dict):
 

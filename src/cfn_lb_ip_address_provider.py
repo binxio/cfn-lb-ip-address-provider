@@ -17,6 +17,12 @@ request_schema = {
             "type": "string",
             "description": "to obtain the IP addresses for",
             "pattern": "arn:aws:elasticloadbalancing:[^:]*:[^:]*:loadbalancer/.*"
+        },
+        "Format": {
+            "type": "string",
+            "description": "of the IP address",
+            "enum": ["plain", "cidr"],
+            "default": "cidr"
         }
     }
 }
@@ -35,6 +41,9 @@ class LBIpAddressProvider(ResourceProvider):
     def load_balancer_arn(self):
         return self.get('LoadBalancerArn')
 
+    def format(self, address):
+        return f'{address}/32' if self.get('Format', 'cidr') == 'cidr' else f'{address}'
+
     def ensure_physical_resource_id(self):
         if not self.physical_resource_id:
             self.physical_resource_id = '{}'.format(uuid4())
@@ -46,7 +55,7 @@ class LBIpAddressProvider(ResourceProvider):
         if m:
             response = self.ec2.describe_network_interfaces(
                 Filters=[{'Name': 'description', 'Values': ['ELB {}'.format(m.group('id'))]}])
-            ip_addresses = ["{}/32".format(address['PrivateIpAddress']) for addresses in
+            ip_addresses = [self.format(address['PrivateIpAddress']) for addresses in
                             map(lambda i: i['PrivateIpAddresses'], response['NetworkInterfaces']) for address in
                             addresses]
             self.set_attribute('PrivateIpAddresses', ip_addresses)
