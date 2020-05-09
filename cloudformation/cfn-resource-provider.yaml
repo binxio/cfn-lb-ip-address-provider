@@ -2,12 +2,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation Load Balancer IP address Provider
 Parameters:
+  S3BucketName:
+    Type: String
+    Default: ''
   S3BucketPrefix:
     Type: String
     Default: 'binxio-public'
   CFNCustomProviderZipFileName:
     Type: String
-    Default: lambdas/cfn-lb-ip-address-provider-0.2.3.zip
+    Default: 'lambdas/cfn-lb-ip-address-provider-0.2.3.zip'
+Conditions:
+  UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
@@ -22,8 +27,9 @@ Resources:
             Resource: '*'
           - Effect: Allow
             Action:
-              - logs:*
-            Resource: arn:aws:logs:*:*:*
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !GetAtt 'CFNCustomProviderLogGroup.Arn'
       Roles:
         - !Ref 'LambdaRole'
   LambdaRole:
@@ -38,14 +44,19 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
+  CFNCustomProviderLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/binxio-cfn-lb-ip-address-provider
+      RetentionInDays: 7
   CFNAMIProvider:
     Type: AWS::Lambda::Function
     DependsOn:
-      - LambdaPolicy
+      - CFNCustomProviderLogGroup
     Properties:
       Description: CloudFormation Custom:LBIpAddress implementation
       Code:
-        S3Bucket: !Sub '${S3BucketPrefix}-${AWS::Region}'
+        S3Bucket: !If [UseBucketName, !Ref S3BucketName, !Sub '${S3BucketPrefix}-${AWS::Region}']
         S3Key: !Ref 'CFNCustomProviderZipFileName'
       FunctionName: binxio-cfn-lb-ip-address-provider
       Handler: cfn_lb_ip_address_provider.handler
@@ -53,3 +64,6 @@ Resources:
       Timeout: 30
       Role: !GetAtt 'LambdaRole.Arn'
       Runtime: python3.6
+Outputs:
+  LambdaArn:
+    Value: !Ref CFNAMIProvider
