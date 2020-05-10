@@ -11,11 +11,11 @@ load balancers, so you can explicitly grant access to these load balancers.
 
 
 ## How do get the IP addresses of a Load Balancer?
-It is quite easy: you specify a CloudFormation resource of the [Custom::LBIpAddresses](docs/Custom::LBIpAddresses.md), as follows:
+It is quite easy: you specify a CloudFormation resource of the [Custom::LBIpAddress](docs/Custom-LBIpAddress.md), as follows:
 
 ```yaml
-  LBIpAddresses:
-    Type: Custom::LBIpAddresses
+  LBIpAddress:
+    Type: Custom::LBIpAddress
     Properties:
       LoadBalancerArn: !Ref NetworkLoadBalancer
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-lb-ip-address-provider'
@@ -23,7 +23,7 @@ It is quite easy: you specify a CloudFormation resource of the [Custom::LBIpAddr
 Outputs:
   PrivateIpAddresses:
     Type: String
-    Value: !Ref LBIpAddresses.PrivateIpAddresses
+    Value: !Ref LBIpAddress.PrivateIpAddresses
       
 ```
 
