@@ -10,6 +10,7 @@ With this custom CloudFormation Provider you can obtain the actual private ip ad
 load balancers, so you can explicitly grant access to these load balancers.
 
 
+
 ## How do get the IP addresses of a Load Balancer?
 It is quite easy: you specify a CloudFormation resource of the [Custom::LBIpAddress](docs/Custom-LBIpAddress.md), as follows:
 
@@ -92,3 +93,6 @@ aws cloudformation wait stack-create-complete  --stack-name cfn-lb-ip-address-de
 ## Conclusion
 With this custom CloudFormation Provider you can create security groups which allow the Network Load Balancer to perform the health checks, without 
 opening the port up to a whole set of subnet ranges. You can use the exact ip addresses of that load balancer.
+
+
+[How to obtain the IP Addresses of a Network Load Balancer in CloudFormation](https://binx.io/blog/2018/08/16/how-to-obtain-the-ip-addresses-of-a-network-load-balancer-in-cloudformation/)
