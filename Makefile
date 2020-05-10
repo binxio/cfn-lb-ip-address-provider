@@ -3,7 +3,11 @@ include Makefile.mk
 NAME=cfn-lb-ip-address-provider
 S3_BUCKET_PREFIX=binxio-public
 AWS_REGION=eu-central-1
-ALL_REGIONS=$(shell printf "import boto3\nprint('\\\n'.join(map(lambda r: r['RegionName'], boto3.client('ec2').describe_regions()['Regions'])))\n" | python | grep -v '^$(AWS_REGION)$$')
+S3_BUCKET=$(S3_BUCKET_PREFIX)-$(AWS_REGION)
+ALL_REGIONS=$(shell aws --region $(AWS_REGION) \
+		ec2 describe-regions 		\
+		--query 'join(`\n`, Regions[?RegionName != `$(AWS_REGION)`].RegionName)' \
+		--output text)
 
 help:
 	@echo 'make                 - builds a zip file to target/.'
