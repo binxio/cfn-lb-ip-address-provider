@@ -1,9 +1,12 @@
-FROM python:3.6
-RUN apt-get update && apt-get install -y zip
+FROM public.ecr.aws/lambda/python:3.9
+RUN yum install -y zip
 WORKDIR /lambda
 
+# Install required Python libraries
 ADD requirements.txt /tmp
 RUN pip install --quiet -t /lambda -r /tmp/requirements.txt
+
+
 ADD src/ /lambda/
 RUN find /lambda -type d -print0 | xargs -0 chmod ugo+rx && \
     find /lambda -type f -print0 | xargs -0 chmod ugo+r
