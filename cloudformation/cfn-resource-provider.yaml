@@ -48,7 +48,7 @@ Resources:
       Description: CloudFormation Custom:LBIpAddress implementation
       PackageType: Image
       Code:
-        ImageUri: 463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-lb-ip-address-provider:1.0.0-7bc3d37-dirty
+        ImageUri: 463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-lb-ip-address-provider:2.0.0
       FunctionName: binxio-cfn-lb-ip-address-provider
       MemorySize: 128
       Timeout: 30
