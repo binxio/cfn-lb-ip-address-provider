@@ -1,18 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation Load Balancer IP address Provider
-Parameters:
-  S3BucketName:
-    Type: String
-    Default: ''
-  S3BucketPrefix:
-    Type: String
-    Default: 'binxio-public'
-  CFNCustomProviderZipFileName:
-    Type: String
-    Default: 'lambdas/cfn-lb-ip-address-provider-1.0.0.zip'
-Conditions:
-  UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
@@ -32,6 +20,7 @@ Resources:
             Resource: !GetAtt 'CFNCustomProviderLogGroup.Arn'
       Roles:
         - !Ref 'LambdaRole'
+
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -44,26 +33,26 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
+
   CFNCustomProviderLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: /aws/lambda/binxio-cfn-lb-ip-address-provider
       RetentionInDays: 7
-  CFNAMIProvider:
+
+  CFNProvider:
     Type: AWS::Lambda::Function
     DependsOn:
       - CFNCustomProviderLogGroup
     Properties:
       Description: CloudFormation Custom:LBIpAddress implementation
+      PackageType: Image
       Code:
-        S3Bucket: !If [UseBucketName, !Ref S3BucketName, !Sub '${S3BucketPrefix}-${AWS::Region}']
-        S3Key: !Ref 'CFNCustomProviderZipFileName'
+        ImageUri: 463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-lb-ip-address-provider:1.0.0-7bc3d37-dirty
       FunctionName: binxio-cfn-lb-ip-address-provider
-      Handler: cfn_lb_ip_address_provider.handler
       MemorySize: 128
       Timeout: 30
       Role: !GetAtt 'LambdaRole.Arn'
-      Runtime: python3.9
 Outputs:
   LambdaArn:
-    Value: !Ref CFNAMIProvider
+    Value: !Ref CFNProvider
